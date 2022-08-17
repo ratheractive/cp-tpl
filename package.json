@@ -9,6 +9,7 @@
   "author": "Slawomir Biegluk",
   "license": "MIT",
   "devDependencies": {
+    "dir-compare": "^4.0.0",
     "jest": "^28.1.3"
   }
 }
