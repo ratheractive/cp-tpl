@@ -12,6 +12,10 @@ describe("When source directory is templatized", () => {
             action: "replace",
             from: "TemplateValueOne",
             to: "ActualValueOne"
+        },
+        {
+            action: "ignore",
+            paths: ["/ToNotBeCopied", "ToNotBeCopied.txt"]
         }
     ]
 
