@@ -1,0 +1,14 @@
+{
+  "name": "tpl-dir",
+  "version": "1.0.0",
+  "description": "Creates directory based on template directory. In the process, it replaces strings both in the content of text files and in file/directory names.",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "Slawomir Biegluk",
+  "license": "MIT",
+  "devDependencies": {
+    "jest": "^28.1.3"
+  }
+}
