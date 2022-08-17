@@ -1,8 +1,9 @@
 {
   "name": "tpl-dir",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Creates directory based on template directory. In the process, it replaces strings both in the content of text files and in file/directory names.",
   "main": "index.js",
+  "repository": "github:ratheractive/tpl-dir",
   "scripts": {
     "test": "jest"
   },
