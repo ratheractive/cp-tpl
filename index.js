@@ -14,7 +14,7 @@ const tplDir = async (srcDir, destDir, rules) => {
             continue
         }
 
-        let destItemPath = path.join(destDir, templateString(srcItemName, rules))
+        let destItemPath = path.join(destDir, replaceString(srcItemName, rules))
 
         let srcItemLstat = fs.lstatSync(srcItemPath)
         if (srcItemLstat.isDirectory()) {
@@ -26,15 +26,13 @@ const tplDir = async (srcDir, destDir, rules) => {
 }
 
 const shouldIgnore = (path, rules) => {
-    return rules.filter(r => r.action === "ignore" && r.paths.find(p => path.includes(p)) !== undefined).length > 0
+    return rules.exclude.find(p => path.includes(p)) !== undefined
 }
 
-const templateString = (orig, rules) => {
+const replaceString = (orig, rules) => {
     let newValue = orig;
-    for (let rule of rules) {
-        switch (rule.action) {
-            case "replace": newValue = newValue.replaceAll(rule.from, rule.to)
-        }
+    for (let rule in rules.replace) {
+        newValue = newValue.replaceAll(rule, rules.replace[rule])
     }
 
     return newValue
@@ -43,7 +41,7 @@ const templateString = (orig, rules) => {
 const templateFile = (srcFilePath, destFilePath, rules) => {
     let srcFileContent = fs.readFileSync(srcFilePath, "utf-8")
     let srcFileLstat = fs.lstatSync(srcFilePath)
-    let destFileContent = templateString(srcFileContent, rules)
+    let destFileContent = replaceString(srcFileContent, rules)
     fs.writeFileSync(destFilePath, destFileContent, { mode: srcFileLstat.mode })
 }
 

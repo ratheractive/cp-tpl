@@ -11,17 +11,15 @@ const {dirTpl} = require("dir-tpl")
 
 const templateDirPath = "/home/dev1/templates/my_service_template"
 const outputDirPath = "/home/dev1/projects/service"
-const rules = [
-    {
-        action: "replace",
-        from: "TemplateValueOne",
-        to: "ActualValueOne"
-    },
-    {
-        action: "ignore",
-        paths: ["path1","path2"]
-    }
-]
 
+const rules = {
+    replace: {
+        "TemplateValueOne": "ActualValueOne"
+    },
+    exclude: ["path1","path2"],
+    toggle: {
+        "TOGGLE_ONE": true
+    }
+}
 await dirTpl(templateDirPath, outputDirPath, rules)
 ```
