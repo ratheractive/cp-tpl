@@ -14,12 +14,12 @@ describe("When source directory is templatized", () => {
         exclude: ["/ToNotBeCopied", "ToNotBeCopied.txt"]
     }
 
-    beforeAll(async () => {
+    beforeAll(() => {
         fs.rmSync(destDirPath, { recursive: true, force: true })
-        await tplDir(srcDirPath, destDirPath, rules)
+        tplDir(srcDirPath, destDirPath, rules)
     })
 
-    it("The output is correct", async () => {
+    it("The output is correct", () => {
         const diff = compareSync(expectedDirPath, destDirPath, {
             compareContent: true, compareDate: false,
             resultBuilder: function (entry1, entry2, state, level, relativePath, options, statistics, diffSet, reason) {

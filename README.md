@@ -17,9 +17,37 @@ const rules = {
         "TemplateValueOne": "ActualValueOne"
     },
     exclude: ["path1","path2"],
+}
+await dirTpl(templateDirPath, outputDirPath, rules)
+```
+
+## comming next
+
+### Conditional exclusion of parts of file
+
+You will be able to declare a toggle like this
+``` js
+const rules = {
     toggle: {
         "TOGGLE_ONE": true
     }
 }
-await dirTpl(templateDirPath, outputDirPath, rules)
 ```
+
+and then use it in your code file like this
+
+``` js
+const a = require('b')
+
+// tpl-dir:if TOGGLE_ONE
+a.configureIfToggleOneOn()
+
+// tpl-dir:endif TOGGLE_ONE
+```
+
+I'm sure you can already see where this is going...
+
+Other rules are:
+* if there is a "tpl-dir:if TOGGLE_X" statement in code and TOGGLE_X isn't defined, the app will throw an exception
+* if there's no closing code, the lib will throw an exception
+* whatever is the comment line indication, the whole line will be removed

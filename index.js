@@ -1,7 +1,7 @@
 const fs = require("fs")
 const path = require("path")
 
-const tplDir = async (srcDir, destDir, rules) => {
+const tplDir = (srcDir, destDir, rules) => {
     const srcDirLstat = fs.lstatSync(srcDir)
 
     fs.mkdirSync(destDir, { mode: srcDirLstat.mode })
@@ -10,29 +10,29 @@ const tplDir = async (srcDir, destDir, rules) => {
 
     for (let srcItemName of srcItems) {
         let srcItemPath = path.join(srcDir, srcItemName)
-        if (shouldIgnore(srcItemPath, rules)) {
+        if (shouldExcludeFile(srcItemPath, rules.exclude)) {
             continue
         }
 
-        let destItemPath = path.join(destDir, replaceString(srcItemName, rules))
+        let destItemPath = path.join(destDir, replaceString(srcItemName, rules.replace))
 
         let srcItemLstat = fs.lstatSync(srcItemPath)
         if (srcItemLstat.isDirectory()) {
-            await tplDir(srcItemPath, destItemPath, rules)
+            tplDir(srcItemPath, destItemPath, rules)
         } else {
             templateFile(srcItemPath, destItemPath, rules)
         }
     }
 }
 
-const shouldIgnore = (path, rules) => {
-    return rules.exclude.find(p => path.includes(p)) !== undefined
+const shouldExcludeFile = (path, excludeRules) => {
+    return excludeRules.find(p => path.includes(p)) !== undefined
 }
 
-const replaceString = (orig, rules) => {
+const replaceString = (orig, replaceRules) => {
     let newValue = orig;
-    for (let rule in rules.replace) {
-        newValue = newValue.replaceAll(rule, rules.replace[rule])
+    for (let rule in replaceRules) {
+        newValue = newValue.replaceAll(rule, replaceRules[rule])
     }
 
     return newValue
@@ -41,7 +41,7 @@ const replaceString = (orig, rules) => {
 const templateFile = (srcFilePath, destFilePath, rules) => {
     let srcFileContent = fs.readFileSync(srcFilePath, "utf-8")
     let srcFileLstat = fs.lstatSync(srcFilePath)
-    let destFileContent = replaceString(srcFileContent, rules)
+    let destFileContent = replaceString(srcFileContent, rules.replace)
     fs.writeFileSync(destFilePath, destFileContent, { mode: srcFileLstat.mode })
 }
 
