@@ -1,31 +1,30 @@
 import fs from 'fs-extra'
 import { join, dirname } from "path"
-import { globbySync } from "globby"
+import { globby } from "globby"
 
-const tplDir = (srcDir, destDir, rules) => {
-    const exclude = rules.exclude
-    const files = globbySync(["**/*.*", "!.git", "!templatize"], { gitignore: true, absolute: false, dot: true, cwd: srcDir })
+const tplDir = async (srcDir, destDir, rules) => {
+    const files = await globby(["**/*.*", "!.git"], { gitignore: true, absolute: false, dot: true, cwd: srcDir })
 
     const pathMap = files
         .map(f => [join(srcDir, f), join(destDir, replaceString(f, rules.replace))])
-        .filter(f => !exclude.some(e => f[0].includes(e)))
+        .filter(f => !rules.exclude.some(e => f[0].includes(e)))
 
-    copyDirectoryStructure(pathMap)
+    await copyDirectoryStructure(pathMap)
 
     for (let [srcFile, destFile] of pathMap) {
-        templateFile(srcFile, destFile, rules)
+        await templateFile(srcFile, destFile, rules)
     }
 }
 
-const copyDirectoryStructure = (pathsMap) => {
+const copyDirectoryStructure = async (pathsMap) => {
     const paths = pathsMap.map(m => [dirname(m[0]), dirname(m[1])]).reduce((prev, cur) => {
         prev[cur[0]] = cur[1];
         return prev;
     }, {})
 
     for (let path in paths) {
-        let plstat = fs.lstatSync(path).mode
-        fs.mkdirSync(paths[path], { mode: plstat, recursive: true })
+        let plstat = await fs.lstat(path).mode
+        await fs.mkdir(paths[path], { mode: plstat, recursive: true })
     }
 }
 
@@ -38,11 +37,11 @@ const replaceString = (orig, replaceRules) => {
     return newValue
 }
 
-const templateFile = (srcFilePath, destFilePath, rules) => {
-    let srcFileContent = fs.readFileSync(srcFilePath, "utf-8")
-    let srcFileLstat = fs.lstatSync(srcFilePath)
+const templateFile = async (srcFilePath, destFilePath, rules) => {
+    let srcFileContent = await fs.readFile(srcFilePath, "utf-8")
+    let srcFileLstat = await fs.lstat(srcFilePath)
     let destFileContent = replaceString(srcFileContent, rules.replace)
-    fs.writeFileSync(destFilePath, destFileContent, { mode: srcFileLstat.mode })
+    await fs.writeFile(destFilePath, destFileContent, { mode: srcFileLstat.mode })
 }
 
 export { tplDir }

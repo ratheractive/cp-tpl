@@ -1,6 +1,6 @@
 import { join } from 'path';
-import { rmSync, lstatSync } from "fs";
-import { compareSync } from "dir-compare";
+import { lstatSync, rmSync } from "fs";
+import { compare } from "dir-compare";
 import { tplDir } from '..';
 
 describe("When source directory is templatized", () => {
@@ -14,13 +14,13 @@ describe("When source directory is templatized", () => {
         exclude: ["/ToNotBeCopied", "ToNotBeCopied.txt"]
     }
 
-    beforeAll(() => {
+    beforeAll(async () => {
         rmSync(destDirPath, { recursive: true, force: true })
-        tplDir(srcDirPath, destDirPath, rules)
+        await tplDir(srcDirPath, destDirPath, rules)
     })
 
-    it("The output is correct", () => {
-        const diff = compareSync(expectedDirPath, destDirPath, {
+    it("The output is correct", async () => {
+        const diff = await compare(expectedDirPath, destDirPath, {
             compareContent: true, compareDate: false,
             resultBuilder: function (entry1, entry2, state, level, relativePath, options, statistics, diffSet, reason) {
 
