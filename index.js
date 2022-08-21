@@ -1,32 +1,32 @@
-import { lstatSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "fs"
-import { join } from "path"
+import fs from 'fs-extra'
+import { join, dirname } from "path"
+import { globbySync } from "globby"
 
 const tplDir = (srcDir, destDir, rules) => {
-    const srcDirLstat = lstatSync(srcDir)
+    const exclude = rules.exclude
+    const files = globbySync(["**/*.*", "!.git", "!templatize"], { gitignore: true, absolute: false, dot: true, cwd: srcDir })
 
-    mkdirSync(destDir, { mode: srcDirLstat.mode })
+    const pathMap = files
+        .map(f => [join(srcDir, f), join(destDir, replaceString(f, rules.replace))])
+        .filter(f => !exclude.some(e => f[0].includes(e)))
 
-    const srcItems = readdirSync(srcDir)
+    copyDirectoryStructure(pathMap)
 
-    for (let srcItemName of srcItems) {
-        let srcItemPath = join(srcDir, srcItemName)
-        if (shouldExcludePath(srcItemPath, rules)) {
-            continue
-        }
-
-        let destItemPath = join(destDir, replaceString(srcItemName, rules.replace))
-
-        let srcItemLstat = lstatSync(srcItemPath)
-        if (srcItemLstat.isDirectory()) {
-            tplDir(srcItemPath, destItemPath, rules)
-        } else {
-            templateFile(srcItemPath, destItemPath, rules)
-        }
+    for (let [srcFile, destFile] of pathMap) {
+        templateFile(srcFile, destFile, rules)
     }
 }
 
-const shouldExcludePath = (path, rules) => {
-    return rules.exclude.find(p => path.includes(p)) !== undefined
+const copyDirectoryStructure = (pathsMap) => {
+    const paths = pathsMap.map(m => [dirname(m[0]), dirname(m[1])]).reduce((prev, cur) => {
+        prev[cur[0]] = cur[1];
+        return prev;
+    }, {})
+
+    for (let path in paths) {
+        let plstat = fs.lstatSync(path).mode
+        fs.mkdirSync(paths[path], { mode: plstat, recursive: true })
+    }
 }
 
 const replaceString = (orig, replaceRules) => {
@@ -39,11 +39,10 @@ const replaceString = (orig, replaceRules) => {
 }
 
 const templateFile = (srcFilePath, destFilePath, rules) => {
-    let srcFileContent = readFileSync(srcFilePath, "utf-8")
-    let srcFileLstat = lstatSync(srcFilePath)
+    let srcFileContent = fs.readFileSync(srcFilePath, "utf-8")
+    let srcFileLstat = fs.lstatSync(srcFilePath)
     let destFileContent = replaceString(srcFileContent, rules.replace)
-    writeFileSync(destFilePath, destFileContent, { mode: srcFileLstat.mode })
+    fs.writeFileSync(destFilePath, destFileContent, { mode: srcFileLstat.mode })
 }
 
-const _tplDir = tplDir
-export { _tplDir as tplDir }
+export { tplDir }
