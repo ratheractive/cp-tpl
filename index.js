@@ -10,7 +10,7 @@ const tplDir = (srcDir, destDir, rules) => {
 
     for (let srcItemName of srcItems) {
         let srcItemPath = path.join(srcDir, srcItemName)
-        if (shouldExcludeFile(srcItemPath, rules.exclude)) {
+        if (shouldExcludePath(srcItemPath, rules.exclude)) {
             continue
         }
 
@@ -25,7 +25,7 @@ const tplDir = (srcDir, destDir, rules) => {
     }
 }
 
-const shouldExcludeFile = (path, excludeRules) => {
+const shouldExcludePath = (path, excludeRules) => {
     return excludeRules.find(p => path.includes(p)) !== undefined
 }
 

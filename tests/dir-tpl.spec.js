@@ -1,6 +1,6 @@
 const path = require('path')
 const fs = require("fs")
-const { compareSync, Options, Result } = require("dir-compare");
+const { compareSync} = require("dir-compare");
 const { tplDir } = require('..')
 
 describe("When source directory is templatized", () => {

@@ -55,5 +55,5 @@ Other rules are:
 ## Command Line Interface
 
 ``` sh
-> create-from-tpl-dir --src ../template-directory --out output-directory --replace template-val-1=val-1 --replace template-val-2=val2 --exclude templatize
+> create-from-tpl-dir --src ../template-directory --dest output-directory --replace template-val-1=val-1 --replace template-val-2=val2 --exclude templatize
 ```
