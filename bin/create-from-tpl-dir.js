@@ -1,8 +1,8 @@
 #! /usr/bin/env node
-const { cliArgs } = require('../cliArgsParser')
-const { tplDir } = require('../index')
+import { cliArgs } from '../cliArgsParser.js'
+import { tplDir } from '../index.js'
 
-tplDir(cliArgs.src, cliArgs.out, {
+tplDir(cliArgs.src, cliArgs.dest, {
     replace: cliArgs.replace,
     exclude: [...cliArgs.exclude, "node_modules", ".git", "dist", "codegen"]
 })

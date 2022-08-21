@@ -1,62 +1,70 @@
-const commandLineArgs = require('command-line-args')
-const commandLineUsage = require('command-line-usage')
-const fs = require('fs')
+import commandLineArgs from 'command-line-args'
+import commandLineUsage from 'command-line-usage'
+import { existsSync } from 'fs'
 
-const args = commandLineArgs([
-    { name: 'help', alias: 'h', type: Boolean, defaultValue: false },
-    { name: 'src', type: String },
-    { name: 'dest', type: String },
-    { name: 'replace', type: String, multiple: true },
-    { name: 'exclude', type: String, multiple: true }
+const aboutCli = commandLineUsage([
+    {
+        header: 'Directory based templating engine.',
+        content: 'Use any directory as a template. ' +
+            'Unlike other templating engines, this one does not require using any special syntax in the file names or in the files content. ' +
+            'All you need to do is specify which strings should be replaced with what, and those will be replaced in both the paths and the content.'
+    },
+    {
+        header: 'Options',
+        optionList: [
+            {
+                name: 'src',
+                typeLabel: '{underline directory}',
+                description: 'The input template directory.'
+            },
+            {
+                name: 'dest',
+                typeLabel: '{underline directory}',
+                description: 'The destinations directory.'
+            },
+            {
+                name: 'replace',
+                typeLabel: '{underline key=value}',
+                description: 'Replace key with value while materializing the template.'
+            },
+            {
+                name: 'exclude',
+                typeLabel: '{underline path}',
+                description: 'Exclude the path while materializing the template.'
+            },
+            {
+                name: 'help',
+                description: 'Print this usage guide.'
+            }
+        ]
+    },
+    {
+        header: "Examples",
+        content: [
+            {
+                "example": "create-from-tpl-dir --src dir-in --dest dir-out --replace var1=var2 vara=varb --ignore coverage.xml"
+            }
+        ]
+    }
 ])
 
-if (args.help) {
-    console.log(commandLineUsage([
-        {
-            header: 'Directory based templating engine.',
-            content: 'Use any directory as a template. ' +
-                'Unlike other templating engines, this one does not require using any special syntax in the file names or in the files content. ' +
-                'All you need to do is specify which strings should be replaced with what, and those will be replaced in both the paths and the content.'
-        },
-        {
-            header: 'Options',
-            optionList: [
-                {
-                    name: 'src',
-                    typeLabel: '{underline directory}',
-                    description: 'The input template directory.'
-                },
-                {
-                    name: 'dest',
-                    typeLabel: '{underline directory}',
-                    description: 'The destinations directory.'
-                },
-                {
-                    name: 'replace',
-                    typeLabel: '{underline key=value}',
-                    description: 'Replace key with value while materializing the template.'
-                },
-                {
-                    name: 'exclude',
-                    typeLabel: '{underline path}',
-                    description: 'Exclude the path while materializing the template.'
-                },
-                {
-                    name: 'help',
-                    description: 'Print this usage guide.'
-                }
-            ]
-        },
-        {
-            header: "Examples",
-            content: [
-                {
-                    "example": "create-from-tpl-dir --src dir-in --dest dir-out --replace var1=var2 vara=varb --ignore coverage.xml"
-                }
-            ]
-        }
-    ]))
+let args
 
+try {
+    args = commandLineArgs([
+        { name: 'help', alias: 'h', type: Boolean, defaultValue: false },
+        { name: 'src', type: String },
+        { name: 'dest', type: String },
+        { name: 'replace', type: String, multiple: true },
+        { name: 'exclude', type: String, multiple: true }
+    ])
+} catch (e) {
+    console.error(e.message)
+    process.exit(1)
+}
+
+if (args.help) {
+    console.log(aboutCli)
     process.exit(0)
 }
 
@@ -65,7 +73,7 @@ function parse(args) {
         return ["please provide the --src argument", undefined]
     }
 
-    if (!fs.existsSync(args.src)) {
+    if (!existsSync(args.src)) {
         return [`src "${args.src}" does not exist`, undefined]
     }
 
@@ -73,7 +81,7 @@ function parse(args) {
         return ["please provide the --dest argument", undefined]
     }
 
-    if (fs.existsSync(args.dest)) {
+    if (existsSync(args.dest)) {
         return [`Destination directory "${args.dest}" already exists. Please delete it first.`, undefined]
     }
 
@@ -110,4 +118,4 @@ if (validationMsg !== undefined) {
     process.exit(1)
 }
 
-exports.cliArgs = cliArgs
+export { cliArgs }

@@ -1,12 +1,12 @@
-const path = require('path')
-const fs = require("fs")
-const { compareSync} = require("dir-compare");
-const { tplDir } = require('..')
+import { join } from 'path';
+import { rmSync, lstatSync } from "fs";
+import { compareSync } from "dir-compare";
+import { tplDir } from '..';
 
 describe("When source directory is templatized", () => {
-    let srcDirPath = path.join(process.cwd(), 'tests', 'test-input-dir')
-    let expectedDirPath = path.join(process.cwd(), 'tests', 'test-output-dir')
-    let destDirPath = path.join('/tmp', 'test-tpl-out-dir')
+    let srcDirPath = join(process.cwd(), 'tests', 'test-input-dir')
+    let expectedDirPath = join(process.cwd(), 'tests', 'test-output-dir')
+    let destDirPath = join('/tmp', 'test-tpl-out-dir')
     let rules = {
         replace: {
             "TemplateValueOne": "ActualValueOne"
@@ -15,7 +15,7 @@ describe("When source directory is templatized", () => {
     }
 
     beforeAll(() => {
-        fs.rmSync(destDirPath, { recursive: true, force: true })
+        rmSync(destDirPath, { recursive: true, force: true })
         tplDir(srcDirPath, destDirPath, rules)
     })
 
@@ -25,7 +25,7 @@ describe("When source directory is templatized", () => {
             resultBuilder: function (entry1, entry2, state, level, relativePath, options, statistics, diffSet, reason) {
 
                 let modeDiff = entry1 !== undefined && entry2 !== undefined
-                    ? fs.lstatSync(entry1.absolutePath).mode !== fs.lstatSync(entry2.absolutePath).mode
+                    ? lstatSync(entry1.absolutePath).mode !== lstatSync(entry2.absolutePath).mode
                     : false
 
                 diffSet.push(

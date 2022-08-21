@@ -1,22 +1,22 @@
-const fs = require("fs")
-const path = require("path")
+import { lstatSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "fs"
+import { join } from "path"
 
 const tplDir = (srcDir, destDir, rules) => {
-    const srcDirLstat = fs.lstatSync(srcDir)
+    const srcDirLstat = lstatSync(srcDir)
 
-    fs.mkdirSync(destDir, { mode: srcDirLstat.mode })
+    mkdirSync(destDir, { mode: srcDirLstat.mode })
 
-    const srcItems = fs.readdirSync(srcDir)
+    const srcItems = readdirSync(srcDir)
 
     for (let srcItemName of srcItems) {
-        let srcItemPath = path.join(srcDir, srcItemName)
-        if (shouldExcludePath(srcItemPath, rules.exclude)) {
+        let srcItemPath = join(srcDir, srcItemName)
+        if (shouldExcludePath(srcItemPath, rules)) {
             continue
         }
 
-        let destItemPath = path.join(destDir, replaceString(srcItemName, rules.replace))
+        let destItemPath = join(destDir, replaceString(srcItemName, rules.replace))
 
-        let srcItemLstat = fs.lstatSync(srcItemPath)
+        let srcItemLstat = lstatSync(srcItemPath)
         if (srcItemLstat.isDirectory()) {
             tplDir(srcItemPath, destItemPath, rules)
         } else {
@@ -25,8 +25,8 @@ const tplDir = (srcDir, destDir, rules) => {
     }
 }
 
-const shouldExcludePath = (path, excludeRules) => {
-    return excludeRules.find(p => path.includes(p)) !== undefined
+const shouldExcludePath = (path, rules) => {
+    return rules.exclude.find(p => path.includes(p)) !== undefined
 }
 
 const replaceString = (orig, replaceRules) => {
@@ -39,10 +39,11 @@ const replaceString = (orig, replaceRules) => {
 }
 
 const templateFile = (srcFilePath, destFilePath, rules) => {
-    let srcFileContent = fs.readFileSync(srcFilePath, "utf-8")
-    let srcFileLstat = fs.lstatSync(srcFilePath)
+    let srcFileContent = readFileSync(srcFilePath, "utf-8")
+    let srcFileLstat = lstatSync(srcFilePath)
     let destFileContent = replaceString(srcFileContent, rules.replace)
-    fs.writeFileSync(destFilePath, destFileContent, { mode: srcFileLstat.mode })
+    writeFileSync(destFilePath, destFileContent, { mode: srcFileLstat.mode })
 }
 
-exports.tplDir = tplDir;
+const _tplDir = tplDir
+export { _tplDir as tplDir }
