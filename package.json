@@ -1,16 +1,17 @@
 {
-  "name": "tpl-dir",
-  "version": "2.0.3",
-  "description": "Creates directory based on template directory. In the process, it replaces strings both in the content of text files and in file/directory names.",
+  "name": "cp-tpl",
+  "version": "1.0.0",
+  "description": "Command line and library to copy directory from src to dest while replacing specified values and ignoring specified paths. Great for using any directory of files as a template.",
   "main": "index.js",
-  "repository": "github:ratheractive/tpl-dir",
+  "repository": "github:ratheractive/cp-tpl",
   "type": "module",
+  "keywords": ["cp", "copy", "tpl", "template", "directory", "cli"],
   "scripts": {
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
-    "create-from-tpl-dir": "bin/create-from-tpl-dir.js"
+    "cp-tpl": "bin/cp-tpl.js"
   },
   "bin": {
-    "create-from-tpl-dir": "bin/create-from-tpl-dir.js"
+    "cp-tpl": "bin/cp-tpl.js"
   },
   "author": "Slawomir Biegluk",
   "license": "MIT",

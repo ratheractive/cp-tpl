@@ -2,7 +2,7 @@ import fs from 'fs-extra'
 import { join, dirname } from "path"
 import { globby } from "globby"
 
-const tplDir = async (srcDir, destDir, rules) => {
+const cpTpl = async (srcDir, destDir, rules) => {
     const files = await globby(["**/*.*", "!.git"], { gitignore: true, absolute: false, dot: true, cwd: srcDir })
 
     const pathMap = files
@@ -44,4 +44,4 @@ const templateFile = async (srcFilePath, destFilePath, rules) => {
     await fs.writeFile(destFilePath, destFileContent, { mode: srcFileLstat.mode })
 }
 
-export { tplDir }
+export { cpTpl }

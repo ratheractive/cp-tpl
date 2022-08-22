@@ -2,87 +2,100 @@ import commandLineArgs from 'command-line-args'
 import commandLineUsage from 'command-line-usage'
 import { existsSync } from 'fs'
 
-const aboutCli = commandLineUsage([
-    {
-        header: 'Directory based templating engine.',
-        content: 'Use any directory as a template. ' +
-            'Unlike other templating engines, this one does not require using any special syntax in the file names or in the files content. ' +
-            'All you need to do is specify which strings should be replaced with what, and those will be replaced in both the paths and the content.'
-    },
-    {
-        header: 'Options',
-        optionList: [
-            {
-                name: 'src',
-                typeLabel: '{underline directory}',
-                description: 'The input template directory.'
-            },
-            {
-                name: 'dest',
-                typeLabel: '{underline directory}',
-                description: 'The destinations directory.'
-            },
-            {
-                name: 'replace',
-                typeLabel: '{underline key=value}',
-                description: 'Replace key with value while materializing the template.'
-            },
-            {
-                name: 'exclude',
-                typeLabel: '{underline path}',
-                description: 'Exclude the path while materializing the template.'
-            },
-            {
-                name: 'help',
-                description: 'Print this usage guide.'
-            }
-        ]
-    },
-    {
-        header: "Examples",
-        content: [
-            {
-                "example": "create-from-tpl-dir --src dir-in --dest dir-out --replace var1=var2 vara=varb --ignore coverage.xml"
-            }
-        ]
-    }
-])
+const aboutCli = commandUsage()
 
-let args
+let rawCliArgs, args
 
 try {
-    args = commandLineArgs([
-        { name: 'help', alias: 'h', type: Boolean, defaultValue: false },
-        { name: 'src', type: String },
-        { name: 'dest', type: String },
-        { name: 'replace', type: String, multiple: true },
-        { name: 'exclude', type: String, multiple: true }
-    ])
+    rawCliArgs = extractArgs()
+
+    if (rawCliArgs.help) {
+        console.log(aboutCli)
+        process.exit(0)
+    }
+
+    args = validateAndMap(rawCliArgs)
 } catch (e) {
     console.error(e.message)
     process.exit(1)
 }
 
-if (args.help) {
-    console.log(aboutCli)
-    process.exit(0)
+function commandUsage() {
+    return commandLineUsage([
+        {
+            header: 'Copy files while replacing values.',
+            content: 'This tool allows you to use any directory as a template. It will copy source directory into destination while ' +
+                'replacing values and excluding given paths as instructed.'
+        },
+        {
+            header: 'Usage',
+            content: 'cp-tpl <src dir> <dest dir> [--replace key1=val1 key2=val2] [--exclude path1 path2]'
+        },
+        {
+            header: 'Options',
+            optionList: [
+                {
+                    name: 'replace',
+                    typeLabel: '{underline key=value}',
+                    description: 'Replace key with value while materializing the template.'
+                },
+                {
+                    name: 'exclude',
+                    typeLabel: '{underline path}',
+                    description: 'Exclude the path while materializing the template.'
+                },
+                {
+                    name: 'help',
+                    description: 'Print this usage guide.'
+                }
+            ]
+        },
+        {
+            header: "Examples",
+            content: [
+                {
+                    "example": "cp-tpl dir-in dir-out --replace var1=var2 vara=varb --ignore coverage.xml"
+                }
+            ]
+        }
+    ])
 }
 
-function parse(args) {
+function extractArgs() {
+    let srcArg = commandLineArgs([{ name: "src", defaultOption: true }], { stopAtFirstUnknown: true })
+    if (!srcArg.src) {
+        throw new Error("Missing Src")
+    }
+
+    let destArg = commandLineArgs([{ name: "dest", defaultOption: true }], { stopAtFirstUnknown: true, argv: srcArg._unknown || [] })
+    if (!destArg.dest) {
+        throw new Error("Missing Dest")
+    }
+
+    let args = commandLineArgs([
+        { name: 'help', alias: 'h', type: Boolean, defaultValue: false },
+        { name: 'replace', type: String, multiple: true },
+        { name: 'exclude', type: String, multiple: true },
+    ], { argv: destArg._unknown || [] })
+
+    return { ...args, src: srcArg.src, dest: destArg.dest }
+}
+
+function validateAndMap(args) {
     if (!args.src) {
-        return ["please provide the --src argument", undefined]
+        throw Error("please provide the --src argument")
     }
 
     if (!existsSync(args.src)) {
-        return [`src "${args.src}" does not exist`, undefined]
+        throw Error(`src "${args.src}" does not exist`)
     }
 
     if (!args.dest) {
-        return ["please provide the --dest argument", undefined]
+        throw Error("please provide the --dest argument")
     }
 
     if (existsSync(args.dest)) {
-        return [`Destination directory "${args.dest}" already exists. Please delete it first.`, undefined]
+        throw Error(`Destination directory "${args.dest}" already exists. Please delete it first.`)
     }
 
     const replaceList = args.replace?.map(r => r.split("="))
@@ -95,7 +108,7 @@ function parse(args) {
     const duplicates = Object.keys(replaceDups).filter(k => replaceDups[k] > 1)
 
     if (duplicates.length > 0) {
-        return [`Duplicated replace keys: ${duplicates.join(',')}`, undefined]
+        throw Error(`Duplicated replace keys: ${duplicates.join(',')}`)
     }
 
     const replace = replaceList?.reduce((prev, cur) => {
@@ -103,19 +116,12 @@ function parse(args) {
         return prev
     }, {})
 
-    return [undefined, {
+    return {
         src: args.src,
         dest: args.dest,
         replace,
         exclude: args.exclude || []
-    }]
+    }
 }
 
-const [validationMsg, cliArgs] = parse(args)
-
-if (validationMsg !== undefined) {
-    console.log(validationMsg)
-    process.exit(1)
-}
-
-export { cliArgs }
+export { args }

@@ -1,9 +1,9 @@
 import { join } from 'path';
 import { lstatSync, rmSync } from "fs";
 import { compare } from "dir-compare";
-import { tplDir } from '..';
+import { cpTpl } from '..';
 
-describe("When source directory is templatized", () => {
+describe("When you copy directory with instructions", () => {
     let srcDirPath = join(process.cwd(), 'tests', 'test-input-dir')
     let expectedDirPath = join(process.cwd(), 'tests', 'test-output-dir')
     let destDirPath = join('/tmp', 'test-tpl-out-dir')
@@ -16,10 +16,10 @@ describe("When source directory is templatized", () => {
 
     beforeAll(async () => {
         rmSync(destDirPath, { recursive: true, force: true })
-        await tplDir(srcDirPath, destDirPath, rules)
+        await cpTpl(srcDirPath, destDirPath, rules)
     })
 
-    it("The output is correct", async () => {
+    it("The output is as expected", async () => {
         const diff = await compare(expectedDirPath, destDirPath, {
             compareContent: true, compareDate: false,
             resultBuilder: function (entry1, entry2, state, level, relativePath, options, statistics, diffSet, reason) {

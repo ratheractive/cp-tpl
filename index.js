@@ -1,3 +1,3 @@
-import { tplDir } from "./src/tplDir";
+import { cpTpl } from "./src/cpTpl";
 
-export {tplDir}
+export {cpTpl}
