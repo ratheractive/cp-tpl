@@ -23,7 +23,11 @@ await cpTpl(templateDirPath, outputDirPath, rules)
 
 ## comming next
 
-### Conditional exclusion of parts of file
+### More similarity to the linux cp command
+
+The command should in the future behave much like the unix cp command with the difference of replacing or skipping things based on extra parameters.
+
+### Conditios inside of file
 
 You will be able to declare a toggle like this
 ``` js

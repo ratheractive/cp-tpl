@@ -1,6 +1,6 @@
 import commandLineArgs from 'command-line-args'
 import commandLineUsage from 'command-line-usage'
-import { existsSync } from 'fs'
+import { existsSync, lstat, lstatSync } from 'fs'
 
 const aboutCli = commandUsage()
 
@@ -63,14 +63,8 @@ function commandUsage() {
 
 function extractArgs() {
     let srcArg = commandLineArgs([{ name: "src", defaultOption: true }], { stopAtFirstUnknown: true })
-    if (!srcArg.src) {
-        throw new Error("Missing Src")
-    }
 
     let destArg = commandLineArgs([{ name: "dest", defaultOption: true }], { stopAtFirstUnknown: true, argv: srcArg._unknown || [] })
-    if (!destArg.dest) {
-        throw new Error("Missing Dest")
-    }
 
     let args = commandLineArgs([
         { name: 'help', alias: 'h', type: Boolean, defaultValue: false },
@@ -83,19 +77,23 @@ function extractArgs() {
 
 function validateAndMap(args) {
     if (!args.src) {
-        throw Error("please provide the --src argument")
+        throw new Error("Missing argument: source")
     }
 
     if (!existsSync(args.src)) {
-        throw Error(`src "${args.src}" does not exist`)
+        throw new Error(`Invalid argument: source does not exist - ${args.src}`)
+    }
+
+    if (!lstatSync(args.src).isDirectory()) {
+        throw new Error("Invalid argument: source must be a directory")
     }
 
     if (!args.dest) {
-        throw Error("please provide the --dest argument")
+        throw new Error("Missing argument: destination")
     }
 
-    if (existsSync(args.dest)) {
-        throw Error(`Destination directory "${args.dest}" already exists. Please delete it first.`)
+    if (existsSync(argc.dest) && !lstatSync(args.src).isDirectory()) {
+        throw new Error("Invalid argument: destination must be a directory")
     }
 
     const replaceList = args.replace?.map(r => r.split("="))
@@ -108,7 +106,7 @@ function validateAndMap(args) {
     const duplicates = Object.keys(replaceDups).filter(k => replaceDups[k] > 1)
 
     if (duplicates.length > 0) {
-        throw Error(`Duplicated replace keys: ${duplicates.join(',')}`)
+        throw new Error(`Invalid argument: duplicated replace keys: ${duplicates.join(',')}`)
     }
 
     const replace = replaceList?.reduce((prev, cur) => {
