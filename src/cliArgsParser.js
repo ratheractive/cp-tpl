@@ -92,7 +92,7 @@ function validateAndMap(args) {
         throw new Error("Missing argument: destination")
     }
 
-    if (existsSync(argc.dest) && !lstatSync(args.src).isDirectory()) {
+    if (existsSync(args.dest) && !lstatSync(args.src).isDirectory()) {
         throw new Error("Invalid argument: destination must be a directory")
     }
 
