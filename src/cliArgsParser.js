@@ -1,6 +1,6 @@
 import commandLineArgs from 'command-line-args'
 import commandLineUsage from 'command-line-usage'
-import { existsSync, lstat, lstatSync } from 'fs'
+import { existsSync, lstatSync } from 'fs'
 
 const aboutCli = commandUsage()
 
