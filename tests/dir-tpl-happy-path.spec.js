@@ -4,8 +4,8 @@ import { compare } from "dir-compare";
 import { cpTpl } from '..';
 
 describe("When you copy directory with instructions", () => {
-    let srcDirPath = join(process.cwd(), 'tests', 'test-input-dir')
-    let expectedDirPath = join(process.cwd(), 'tests', 'test-output-dir')
+    let srcDirPath = join(process.cwd(), 'tests', 'data', 'test-input-dir')
+    let expectedDirPath = join(process.cwd(), 'tests', 'data', 'test-output-dir')
     let destDirPath = join('/tmp', 'test-tpl-out-dir')
     let rules = {
         replace: {

@@ -1,6 +1,6 @@
 {
   "name": "cp-tpl",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Command line and library to copy directory from src to dest while replacing specified values and ignoring specified paths. Great for using any directory of files as a template.",
   "main": "index.js",
   "typings": "index.d.ts",

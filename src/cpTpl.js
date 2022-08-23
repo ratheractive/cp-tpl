@@ -2,7 +2,32 @@ import fs from 'fs-extra'
 import { join, dirname } from "path"
 import { globby } from "globby"
 
+const validate = (srcDir, destDir, rules) => {
+    if (!srcDir) {
+        throw new Error("Invalid argument: srcDir can't be empty")
+    }
+
+    if (!fs.existsSync(srcDir)) {
+        throw new Error(`Invalid argument: srcDir directory does not exist`)
+    }
+
+    if (!fs.lstatSync(srcDir).isDirectory()) {
+        throw new Error("Invalid argument: srcDir must be a directory")
+    }
+
+    if (!destDir) {
+        throw new Error("Invalid argument: destDir can't be undefined")
+    }
+
+    if (fs.existsSync(destDir) && !fs.lstatSync(destDir).isDirectory()) {
+        throw new Error("Invalid argument: destDir must be a directory or not exist at all")
+    }
+}
+
 const cpTpl = async (srcDir, destDir, rules) => {
+
+    validate(srcDir, destDir, rules)
+
     const files = await globby(["**/*.*", "!.git"], { gitignore: true, absolute: false, dot: true, cwd: srcDir })
 
     let pathMap = files
