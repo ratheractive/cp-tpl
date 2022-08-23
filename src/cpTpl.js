@@ -5,9 +5,12 @@ import { globby } from "globby"
 const cpTpl = async (srcDir, destDir, rules) => {
     const files = await globby(["**/*.*", "!.git"], { gitignore: true, absolute: false, dot: true, cwd: srcDir })
 
-    const pathMap = files
+    let pathMap = files
         .map(f => [join(srcDir, f), join(destDir, replaceString(f, rules.replace))])
-        .filter(f => !rules.exclude.some(e => f[0].includes(e)))
+
+    if (rules.exclude !== undefined) {
+        pathMap = pathMap.filter(f => !rules.exclude.some(e => f[0].includes(e)))
+    }
 
     await copyDirectoryStructure(pathMap)
 
@@ -29,6 +32,10 @@ const copyDirectoryStructure = async (pathsMap) => {
 }
 
 const replaceString = (orig, replaceRules) => {
+    if (replaceRules === undefined) {
+        return orig
+    }
+
     let newValue = orig;
     for (let rule in replaceRules) {
         newValue = newValue.replaceAll(rule, replaceRules[rule])
