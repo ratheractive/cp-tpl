@@ -3,11 +3,11 @@ import { lstatSync, rmSync } from "fs";
 import { compare } from "dir-compare";
 import { cpTpl } from '..';
 
-describe("When you copy directory without instructions", () => {
+describe("When you copy directory with no transforms", () => {
     let srcDirPath = join(process.cwd(), 'tests', 'data', 'test-input-dir')
     let expectedDirPath = join(process.cwd(), 'tests', 'data', 'test-input-dir')
-    let destDirPath = join('/tmp', 'test-tpl-out-dir')
-    let rules = {}
+    let destDirPath = join('/tmp', 'test-tpl-out-happy-no-transforms')
+    let rules = { gitignore: false }
 
     beforeAll(async () => {
         rmSync(destDirPath, { recursive: true, force: true })

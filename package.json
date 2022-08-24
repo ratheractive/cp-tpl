@@ -1,6 +1,6 @@
 {
   "name": "cp-tpl",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Command line and library to copy directory from src to dest while replacing specified values and ignoring specified paths. Great for using any directory of files as a template.",
   "main": "index.js",
   "typings": "index.d.ts",
@@ -9,7 +9,8 @@
   "keywords": ["cp", "copy", "tpl", "template", "directory", "cli"],
   "scripts": {
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
-    "cp-tpl": "bin/cp-tpl.js"
+    "cp-tpl": "bin/cp-tpl.js",
+    "prepack": "npm test"
   },
   "bin": {
     "cp-tpl": "bin/cp-tpl.js"

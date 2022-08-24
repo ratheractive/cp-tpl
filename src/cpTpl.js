@@ -24,18 +24,22 @@ const validate = (srcDir, destDir, rules) => {
     }
 }
 
+const applyDefaultRules = (rules = {}) => ({
+    replace: rules.replace ?? {},
+    exclude: rules.exclude ?? [],
+    gitignore: rules.gitignore ?? true
+})
+
 const cpTpl = async (srcDir, destDir, rules) => {
+    rules = applyDefaultRules(rules)
 
     validate(srcDir, destDir, rules)
 
-    const files = await globby(["**/*.*", "!.git"], { gitignore: true, absolute: false, dot: true, cwd: srcDir })
+    const files = await globby(["**/*.*"], { gitignore: rules.gitignore, absolute: false, dot: true, cwd: srcDir })
 
     let pathMap = files
         .map(f => [join(srcDir, f), join(destDir, replaceString(f, rules.replace))])
-
-    if (rules.exclude !== undefined) {
-        pathMap = pathMap.filter(f => !rules.exclude.some(e => f[0].includes(e)))
-    }
+        .filter(f => !rules.exclude.some(e => f[0].includes(e)))
 
     await copyDirectoryStructure(pathMap)
 
@@ -57,7 +61,7 @@ const copyDirectoryStructure = async (pathsMap) => {
 }
 
 const replaceString = (orig, replaceRules) => {
-    if (replaceRules === undefined) {
+    if (Object.keys(replaceRules).length === 0) {
         return orig
     }
 

@@ -3,15 +3,16 @@ import { lstatSync, rmSync } from "fs";
 import { compare } from "dir-compare";
 import { cpTpl } from '..';
 
-describe("When you copy directory with instructions", () => {
+describe("When you copy directory with all transforms", () => {
     let srcDirPath = join(process.cwd(), 'tests', 'data', 'test-input-dir')
     let expectedDirPath = join(process.cwd(), 'tests', 'data', 'test-output-dir')
-    let destDirPath = join('/tmp', 'test-tpl-out-dir')
+    let destDirPath = join('/tmp', 'test-tpl-out-happy-with-instructions')
     let rules = {
         replace: {
             "TemplateValueOne": "ActualValueOne"
         },
-        exclude: ["/ToNotBeCopied", "ToNotBeCopied.txt"]
+        exclude: ["/ToNotBeCopied", "ToNotBeCopied.txt"],
+        gitignore: true
     }
 
     beforeAll(async () => {
