@@ -35,7 +35,7 @@ const cpTpl = async (srcDir, destDir, rules) => {
 
     validate(srcDir, destDir, rules)
 
-    const files = await globby(["**/*.*"], { gitignore: rules.gitignore, absolute: false, dot: true, cwd: srcDir })
+    const files = await globby(["**"], { gitignore: rules.gitignore, absolute: false, dot: true, cwd: srcDir })
 
     let pathMap = files
         .map(f => [join(srcDir, f), join(destDir, replaceString(f, rules.replace))])
@@ -55,8 +55,8 @@ const copyDirectoryStructure = async (pathsMap) => {
     }, {})
 
     for (let path in paths) {
-        let plstat = await fs.lstat(path).mode
-        await fs.mkdir(paths[path], { mode: plstat, recursive: true })
+        let plstat = await fs.lstat(path)
+        await fs.mkdir(paths[path], { mode: plstat.mode, recursive: true })
     }
 }
 
