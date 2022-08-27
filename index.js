@@ -1,3 +1,3 @@
-import { cpTpl } from "./src/cpTpl";
+import { cpTpl } from "./src/cpTpl.js";
 
 export {cpTpl}

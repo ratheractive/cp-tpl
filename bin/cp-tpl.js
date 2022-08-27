@@ -4,5 +4,5 @@ import { cpTpl } from '../src/cpTpl.js'
 
 await cpTpl(args.src, args.dest, {
     replace: args.replace,
-    exclude: [...args.exclude, ".git/"]
+    exclude: [...args.exclude, ".git"]
 })

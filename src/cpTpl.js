@@ -35,11 +35,9 @@ const cpTpl = async (srcDir, destDir, rules) => {
 
     validate(srcDir, destDir, rules)
 
-    const files = await globby(["**"], { gitignore: rules.gitignore, absolute: false, dot: true, cwd: srcDir })
+    const files = await globby(["**"], { gitignore: rules.gitignore, absolute: false, dot: true, cwd: srcDir, ignore: rules.exclude })
 
-    let pathMap = files
-        .map(f => [join(srcDir, f), join(destDir, replaceString(f, rules.replace))])
-        .filter(f => !rules.exclude.some(e => f[0].includes(e)))
+    const pathMap = files.map(f => [join(srcDir, f), join(destDir, replaceString(f, rules.replace))])
 
     await copyDirectoryStructure(pathMap)
 

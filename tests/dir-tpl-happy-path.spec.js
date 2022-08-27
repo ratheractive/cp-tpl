@@ -11,7 +11,7 @@ describe("When you copy directory with all transforms", () => {
         replace: {
             "TemplateValueOne": "ActualValueOne"
         },
-        exclude: ["/ToNotBeCopied", "ToNotBeCopied.txt"],
+        exclude: ["**/ToNotBeCopied", "**/ToNotBeCopied.txt"],
         gitignore: true
     }
 
