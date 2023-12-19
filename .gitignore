@@ -1,3 +1,4 @@
 node_modules
 coverage
-cp-tpl-*.tgz
+rave-tec-cp-tpl-*.tgz
+yarn-error.log
